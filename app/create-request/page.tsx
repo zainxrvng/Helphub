@@ -18,6 +18,7 @@ export default function CreateRequestPage() {
   const [urgency, setUrgency] = useState<Urgency>('Low');
   const [publishing, setPublishing] = useState(false);
   const [publishError, setPublishError] = useState('');
+  const [aiApplied, setAiApplied] = useState(false);
 
   const [aiCategory, setAiCategory] = useState('Community');
   const [aiUrgency, setAiUrgency] = useState<Urgency>('Low');
@@ -40,9 +41,13 @@ export default function CreateRequestPage() {
   }, [title, description]);
 
   function applyAI() {
+    if (!title && !description) return;
     setCategory(aiCategory);
     setUrgency(aiUrgency);
     setTags(aiTags.join(', '));
+    if (aiRewrite) setDescription(aiRewrite);
+    setAiApplied(true);
+    setTimeout(() => setAiApplied(false), 2000);
   }
 
   async function handlePublish() {
@@ -121,7 +126,14 @@ export default function CreateRequestPage() {
               </select>
             </div>
             <div className="flex items-center gap-3 pt-2">
-              <button onClick={applyAI} className="ghost-btn px-6 py-3 text-sm">Apply AI suggestions</button>
+              <button onClick={applyAI} disabled={!title && !description}
+                className={`px-6 py-3 text-sm rounded-full font-medium transition-all border ${
+                  aiApplied
+                    ? 'bg-[#0d9f8f] text-white border-[#0d9f8f]'
+                    : 'ghost-btn'
+                } disabled:opacity-40 disabled:cursor-not-allowed`}>
+                {aiApplied ? '✓ Applied!' : 'Apply AI suggestions'}
+              </button>
               <button onClick={handlePublish} disabled={publishing || !title.trim()}
                 className="teal-btn px-6 py-3 text-sm disabled:opacity-60">
                 {publishing ? 'Publishing...' : 'Publish request'}
