@@ -1,0 +1,108 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: #f0ede8;
+  color: #0f1a18;
+  min-height: 100vh;
+}
+
+.page-bg {
+  background: linear-gradient(135deg, #dff0ea 0%, #f0ede8 40%, #f5e8d8 100%);
+  min-height: 100vh;
+}
+
+.dark-card {
+  background: #1c2d28;
+  color: white;
+  border-radius: 16px;
+}
+
+.teal-btn {
+  background: #0d9f8f;
+  color: white;
+  border-radius: 9999px;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.teal-btn:hover {
+  background: #0b8a7c;
+}
+
+.ghost-btn {
+  background: transparent;
+  color: #0f1a18;
+  border: 1.5px solid #d1d5db;
+  border-radius: 9999px;
+  font-weight: 500;
+  transition: border-color 0.2s;
+}
+
+.ghost-btn:hover {
+  border-color: #0d9f8f;
+}
+
+.card {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+}
+
+.label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #0d9f8f;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 500;
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.tag-teal {
+  background: #e6f7f5;
+  color: #0d9f8f;
+}
+
+.tag-red {
+  background: #fef2f2;
+  color: #ef4444;
+}
+
+.tag-green {
+  background: #f0fdf4;
+  color: #22c55e;
+}
+
+.tag-amber {
+  background: #fffbeb;
+  color: #f59e0b;
+}
+
+input, textarea, select {
+  outline: none;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: #0d9f8f !important;
+  box-shadow: 0 0 0 2px rgba(13, 159, 143, 0.15);
+}
