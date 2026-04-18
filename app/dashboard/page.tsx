@@ -10,6 +10,8 @@ function UrgencyTag({ urgency }: { urgency: string }) {
   const map: Record<string, string> = { High: 'tag-red', Medium: 'tag-amber', Low: 'tag-teal' };
   return <span className={`tag ${map[urgency] || 'tag'}`}>{urgency}</span>;
 }
+ 
+
 
 function StatusTag({ status }: { status: string }) {
   return <span className={`tag ${status === 'Solved' ? 'tag-green' : 'tag-teal'}`}>{status}</span>;
