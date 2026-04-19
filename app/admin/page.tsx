@@ -181,7 +181,7 @@ PLATFORM STATS:
           <>
             {/* ── OVERVIEW ── */}
             {tab === 'overview' && (
-              <div className="space-y-6">
+              <div className="space-y-6 animate-slide-up">
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                   <StatCard label="TOTAL USERS" value={users.length} sub="Registered members" />
                   <StatCard label="TOTAL REQUESTS" value={requests.length} sub={`${requests.filter(r => r.status === 'Open').length} open`} />
@@ -251,7 +251,7 @@ PLATFORM STATS:
 
             {/* ── USERS ── */}
             {tab === 'users' && (
-              <div className="card p-6">
+              <div className="card p-6 animate-slide-up">
                 <p className="label mb-4">ALL USERS ({users.length})</p>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
@@ -307,7 +307,7 @@ PLATFORM STATS:
 
             {/* ── REQUESTS ── */}
             {tab === 'requests' && (
-              <div className="card p-6">
+              <div className="card p-6 animate-slide-up">
                 <p className="label mb-4">ALL REQUESTS ({requests.length})</p>
                 <div className="space-y-3">
                   {requests.map(r => (
@@ -337,66 +337,97 @@ PLATFORM STATS:
 
             {/* ── AI CHAT ── */}
             {tab === 'ai' && (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Context panel */}
-                <div className="card p-6">
-                  <p className="label mb-3">PLATFORM SNAPSHOT</p>
-                  <p className="text-xs text-gray-500 leading-relaxed font-mono whitespace-pre-wrap bg-gray-50 rounded-xl p-3">{platformContext}</p>
-                  <p className="text-xs text-gray-400 mt-4 leading-relaxed">This context is automatically sent to the AI with every message so it can give data-aware answers.</p>
-                  <div className="mt-4 space-y-2">
-                    {[
-                      'Who deserves a trust score boost and why?',
-                      'Which open requests have no helpers yet?',
-                      'Suggest specific badges for each user based on their contributions',
-                      'Which categories are underserved and what skills are missing?',
-                      'Give a full platform health report',
-                      'Who are the top 3 mentors and what makes them stand out?',
-                    ].map(q => (
-                      <button key={q} onClick={() => setChatInput(q)}
-                        className="block w-full text-left text-xs text-[#0d9f8f] bg-[#0d9f8f]/5 hover:bg-[#0d9f8f]/10 rounded-xl px-3 py-2 transition-colors">
-                        {q}
-                      </button>
-                    ))}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-slide-up">
+                {/* Sidebar */}
+                <div className="space-y-4">
+                  {/* Live stats */}
+                  <div className="card p-5">
+                    <p className="label mb-4">LIVE CONTEXT</p>
+                    <div className="space-y-3">
+                      {[
+                        { label: 'Total users', value: users.length },
+                        { label: 'Open requests', value: openRequests.length },
+                        { label: 'Solve rate', value: `${solveRate}%` },
+                        { label: 'High urgency', value: highUrgencyOpen.length, red: highUrgencyOpen.length > 0 },
+                        { label: 'Unhelped requests', value: openRequests.filter(r => r.helperIds.length === 0).length },
+                        { label: 'Messages', value: msgCount },
+                      ].map(({ label, value, red }) => (
+                        <div key={label} className="flex items-center justify-between py-1.5 border-b border-gray-50 last:border-0">
+                          <span className="text-xs text-gray-500">{label}</span>
+                          <span className={`text-sm font-bold ${red ? 'text-red-500' : 'text-[#0f1a18]'}`}>{value}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-xs text-gray-400 mt-3">Full data sent to AI automatically.</p>
+                  </div>
+
+                  {/* Suggested prompts */}
+                  <div className="card p-5">
+                    <p className="label mb-3">SUGGESTED QUESTIONS</p>
+                    <div className="space-y-1.5">
+                      {[
+                        'Who deserves a trust score boost and why?',
+                        'Which open requests have no helpers yet?',
+                        'Suggest badges for each user based on their work',
+                        'Which categories are underserved?',
+                        'Give a full platform health report',
+                        'Who are the top mentors?',
+                      ].map((q, i) => (
+                        <button key={q} onClick={() => setChatInput(q)}
+                          className="block w-full text-left text-xs text-[#0d9f8f] bg-[#0d9f8f]/5 hover:bg-[#0d9f8f]/12 rounded-xl px-3 py-2 transition-all hover:translate-x-0.5"
+                          style={{ animationDelay: `${i * 50}ms` }}>
+                          {q}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
-                {/* Chat */}
-                <div className="lg:col-span-2 card p-6 flex flex-col" style={{ height: '600px' }}>
-                  <div className="flex items-center gap-3 mb-5 pb-4 border-b border-gray-100">
-                    <div className="w-9 h-9 bg-[#0d9f8f] rounded-xl flex items-center justify-center text-white font-bold text-sm">✦</div>
-                    <div>
+                {/* Chat window */}
+                <div className="lg:col-span-2 card flex flex-col overflow-hidden" style={{ height: '680px' }}>
+                  {/* Header */}
+                  <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-100 shrink-0">
+                    <div className="w-9 h-9 bg-gradient-to-br from-[#0d9f8f] to-[#0b7a6e] rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-sm">✦</div>
+                    <div className="flex-1">
                       <p className="font-bold text-[#0f1a18] text-sm">HelpHub AI Assistant</p>
-                      <p className="text-xs text-gray-400">Powered by Gemini 2.5 Flash · Platform-aware</p>
+                      <p className="text-xs text-gray-400">Gemini 2.5 Flash · sees all platform data</p>
                     </div>
+                    <span className={`w-2 h-2 rounded-full ${aiLoading ? 'bg-amber-400 animate-pulse' : 'bg-green-400'}`} />
                   </div>
 
                   {/* Messages */}
-                  <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-1">
+                  <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
                     {chatMessages.length === 0 && (
-                      <div className="flex items-start gap-3">
-                        <div className="w-7 h-7 bg-[#0d9f8f] rounded-lg flex items-center justify-center text-white text-xs font-bold shrink-0">✦</div>
-                        <div className="bg-gray-50 rounded-2xl rounded-tl-sm px-4 py-3 max-w-sm">
-                          <p className="text-sm text-[#0f1a18]">Hello! I have full context on your platform data. Ask me anything — user insights, moderation help, badge recommendations, or trend analysis.</p>
+                      <div className="flex items-start gap-3 animate-slide-up">
+                        <div className="w-8 h-8 bg-gradient-to-br from-[#0d9f8f] to-[#0b7a6e] rounded-xl flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-sm">✦</div>
+                        <div className="bg-gray-50 rounded-2xl rounded-tl-sm px-4 py-3 max-w-md">
+                          <p className="text-sm text-[#0f1a18] leading-relaxed">Hello! I have full access to your platform data — all users, requests, trust scores, and categories. Ask me anything.</p>
                         </div>
                       </div>
                     )}
-                    {chatMessages.map(m => (
-                      <div key={m.id} className={`flex items-start gap-3 ${m.role === 'user' ? 'flex-row-reverse' : ''}`}>
-                        <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-white text-xs font-bold shrink-0 ${m.role === 'user' ? 'bg-[#0f1a18]' : 'bg-[#0d9f8f]'}`}>
-                          {m.role === 'user' ? 'A' : '✦'}
-                        </div>
-                        <div className={`rounded-2xl px-4 py-3 max-w-prose text-sm leading-relaxed whitespace-pre-wrap ${
-                          m.role === 'user' ? 'bg-[#0f1a18] text-white rounded-tr-sm' : 'bg-gray-50 text-[#0f1a18] rounded-tl-sm'
+                    {chatMessages.map((m) => (
+                      <div key={m.id} className={`flex items-start gap-3 bubble-in ${m.role === 'user' ? 'flex-row-reverse' : ''}`}>
+                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-sm ${
+                          m.role === 'user' ? 'bg-[#0f1a18]' : 'bg-gradient-to-br from-[#0d9f8f] to-[#0b7a6e]'
                         }`}>
-                          {m.parts?.map((p: {type: string; text?: string}, i: number) => p.type === 'text' ? <span key={i}>{p.text}</span> : null)}
+                          {m.role === 'user' ? 'U' : '✦'}
+                        </div>
+                        <div className={`rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap max-w-lg ${
+                          m.role === 'user'
+                            ? 'bg-[#0f1a18] text-white rounded-tr-sm'
+                            : 'bg-gray-50 text-[#0f1a18] rounded-tl-sm'
+                        }`}>
+                          {m.parts?.map((p: {type: string; text?: string}, i: number) =>
+                            p.type === 'text' ? <span key={i}>{p.text}</span> : null
+                          )}
                         </div>
                       </div>
                     ))}
                     {aiLoading && (
-                      <div className="flex items-start gap-3">
-                        <div className="w-7 h-7 bg-[#0d9f8f] rounded-lg flex items-center justify-center text-white text-xs font-bold shrink-0">✦</div>
+                      <div className="flex items-start gap-3 animate-fade-in">
+                        <div className="w-8 h-8 bg-gradient-to-br from-[#0d9f8f] to-[#0b7a6e] rounded-xl flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-sm">✦</div>
                         <div className="bg-gray-50 rounded-2xl rounded-tl-sm px-4 py-3">
-                          <div className="flex gap-1">
+                          <div className="flex gap-1.5 items-center h-4">
                             <span className="w-1.5 h-1.5 bg-[#0d9f8f] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                             <span className="w-1.5 h-1.5 bg-[#0d9f8f] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
                             <span className="w-1.5 h-1.5 bg-[#0d9f8f] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
@@ -408,18 +439,20 @@ PLATFORM STATS:
                   </div>
 
                   {/* Input */}
-                  <form onSubmit={handleChatSubmit} className="flex gap-2">
-                    <input
-                      value={chatInput}
-                      onChange={e => setChatInput(e.target.value)}
-                      placeholder="Ask about users, requests, trends…"
-                      className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0d9f8f]"
-                    />
-                    <button type="submit" disabled={aiLoading || !chatInput.trim()}
-                      className="teal-btn px-5 py-2.5 text-sm disabled:opacity-50">
-                      Send
-                    </button>
-                  </form>
+                  <div className="px-6 py-4 border-t border-gray-100 shrink-0">
+                    <form onSubmit={handleChatSubmit} className="flex gap-2">
+                      <input
+                        value={chatInput}
+                        onChange={e => setChatInput(e.target.value)}
+                        placeholder="Ask about users, requests, trends…"
+                        className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm transition-all"
+                      />
+                      <button type="submit" disabled={aiLoading || !chatInput.trim()}
+                        className="teal-btn px-5 py-2.5 text-sm disabled:opacity-50 transition-all">
+                        {aiLoading ? '…' : 'Send'}
+                      </button>
+                    </form>
+                  </div>
                 </div>
               </div>
             )}

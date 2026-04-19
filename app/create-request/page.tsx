@@ -102,7 +102,7 @@ export default function CreateRequestPage() {
     <div className="page-bg min-h-screen">
       <Navbar />
       <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="dark-card p-8 mb-8">
+        <div className="dark-card p-8 mb-8 animate-slide-down">
           <p className="label mb-2" style={{ color: '#9ca3af' }}>CREATE REQUEST</p>
           <h1 className="text-3xl font-bold text-white leading-snug">
             Turn a rough problem into a clear help request.
@@ -111,7 +111,7 @@ export default function CreateRequestPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 card p-7 space-y-5">
+          <div className="lg:col-span-2 card p-7 space-y-5 animate-slide-up delay-100">
             <div>
               <label className="text-sm font-medium text-[#0f1a18] mb-1.5 block">Title</label>
               <input value={title} onChange={e => setTitle(e.target.value)}
@@ -163,7 +163,7 @@ export default function CreateRequestPage() {
             {publishError && <p className="text-red-500 text-sm">{publishError}</p>}
           </div>
 
-          <div className="card p-6">
+          <div className="card p-6 animate-slide-up delay-200">
             <p className="label mb-2">AI ASSISTANT</p>
             <h3 className="text-2xl font-bold text-[#0f1a18] mb-5">Smart request guidance</h3>
             <div className="space-y-4">

@@ -47,7 +47,7 @@ export default function ExplorePage() {
     <div className="page-bg min-h-screen">
       <Navbar />
       <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="dark-card p-8 mb-8">
+        <div className="dark-card p-8 mb-8 animate-slide-down">
           <p className="label mb-2" style={{ color: '#9ca3af' }}>EXPLORE / FEED</p>
           <h1 className="text-3xl font-bold text-white leading-snug">
             Browse help requests with filterable<br />community context.
@@ -56,7 +56,7 @@ export default function ExplorePage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 animate-slide-up delay-100">
             <div className="card p-6 sticky top-24">
               <p className="label mb-2">FILTERS</p>
               <h2 className="text-xl font-bold text-[#0f1a18] mb-5">Refine the feed</h2>
@@ -98,8 +98,8 @@ export default function ExplorePage() {
               <div className="card p-10 text-center text-gray-400 text-sm">Loading requests...</div>
             ) : filtered.length === 0 ? (
               <div className="card p-10 text-center text-gray-400 text-sm">No requests match your filters.</div>
-            ) : filtered.map(req => (
-              <div key={req.id} className="card p-6">
+            ) : filtered.map((req, i) => (
+              <div key={req.id} className="card p-6 card-hover animate-slide-up" style={{ animationDelay: `${i * 60}ms` }}>
                 <div className="flex flex-wrap gap-2 mb-3">
                   <span className="tag">{req.category}</span>
                   <UrgencyTag urgency={req.urgency} />

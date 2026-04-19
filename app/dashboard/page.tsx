@@ -50,7 +50,7 @@ export default function DashboardPage() {
     <div className="page-bg min-h-screen">
       <Navbar />
       <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="dark-card p-8 mb-8">
+        <div className="dark-card p-8 mb-8 animate-slide-down">
           <p className="label mb-2" style={{ color: '#9ca3af' }}>DASHBOARD</p>
           <h1 className="text-3xl font-bold text-white">{user.name}</h1>
           <p className="text-gray-400 text-sm mt-1">{user.role} • {user.location}</p>
@@ -62,8 +62,8 @@ export default function DashboardPage() {
             { label: 'CONTRIBUTIONS', value: user.contributions, sub: 'Total help given' },
             { label: 'NOTIFICATIONS', value: unread, sub: 'Unread updates' },
             { label: 'SOLVED', value: solved, sub: 'Requests resolved' },
-          ].map(s => (
-            <div key={s.label} className="card p-5">
+          ].map((s, i) => (
+            <div key={s.label} className={`card p-5 card-hover animate-slide-up delay-${(i + 1) * 50}`}>
               <p className="label mb-1">{s.label}</p>
               <p className="text-2xl font-bold text-[#0f1a18]">{s.value}</p>
               <p className="text-xs text-gray-400 mt-1">{s.sub}</p>
@@ -72,7 +72,7 @@ export default function DashboardPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 card p-6">
+          <div className="lg:col-span-2 card p-6 animate-slide-up delay-200">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <p className="label mb-1">RECENT REQUESTS</p>
