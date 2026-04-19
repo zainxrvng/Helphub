@@ -1,5 +1,5 @@
 import { google } from '@ai-sdk/google';
-import { streamText } from 'ai';
+import { streamText, convertToModelMessages } from 'ai';
 
 export const runtime = 'nodejs';
 
@@ -20,7 +20,7 @@ Your role:
 - Identify trends, at-risk requests, and top performers
 
 Be concise, data-driven, and practical.`,
-    messages,
+    messages: await convertToModelMessages(messages),
   });
 
   return result.toTextStreamResponse();
