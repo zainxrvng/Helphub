@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getSession, createRequest, addNotification, type Urgency } from '@/lib/store';
-import { detectCategory, detectUrgency, suggestTags, generateRewrite } from '@/lib/ai';
+import { detectCategory, detectUrgency, suggestTags } from '@/lib/ai';
 import Navbar from '@/components/Navbar';
 
 const CATEGORIES = ['Web Development', 'Design', 'Career', 'Data Science', 'DevOps', 'Community'];
@@ -24,6 +24,7 @@ export default function CreateRequestPage() {
   const [aiUrgency, setAiUrgency] = useState<Urgency>('Low');
   const [aiTags, setAiTags] = useState<string[]>([]);
   const [aiRewrite, setAiRewrite] = useState('');
+  const [aiRewriteLoading, setAiRewriteLoading] = useState(false);
 
   useEffect(() => {
     const session = getSession();
@@ -36,8 +37,28 @@ export default function CreateRequestPage() {
       setAiCategory(cat);
       setAiUrgency(detectUrgency(title, description));
       setAiTags(suggestTags(title, description, cat));
-      setAiRewrite(generateRewrite(title, description));
     }
+  }, [title, description]);
+
+  useEffect(() => {
+    if (!title && !description) { setAiRewrite(''); return; }
+    setAiRewriteLoading(true);
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch('/api/ai-rewrite', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, description }),
+        });
+        const data = await res.json();
+        setAiRewrite(data.rewrite || '');
+      } catch {
+        setAiRewrite('');
+      } finally {
+        setAiRewriteLoading(false);
+      }
+    }, 900);
+    return () => clearTimeout(timer);
   }, [title, description]);
 
   function applyAI() {
@@ -163,10 +184,15 @@ export default function CreateRequestPage() {
                   : <p className="text-xs text-gray-400">Add more detail for smarter tags</p>}
               </div>
               <div className="py-3">
-                <p className="text-sm text-gray-500 mb-2">Rewrite suggestion</p>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm text-gray-500">Rewrite suggestion</p>
+                  {aiRewriteLoading && <span className="text-xs text-[#0d9f8f] animate-pulse">Gemini thinking…</span>}
+                </div>
                 {aiRewrite
                   ? <p className="text-xs text-[#0f1a18] leading-relaxed bg-gray-50 rounded-xl p-3">{aiRewrite}</p>
-                  : <p className="text-xs text-gray-400 font-medium">Start describing the challenge to generate a stronger version.</p>}
+                  : !aiRewriteLoading
+                    ? <p className="text-xs text-gray-400 font-medium">Start describing the challenge to generate a stronger version.</p>
+                    : null}
               </div>
             </div>
           </div>
