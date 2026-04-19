@@ -25,6 +25,7 @@ export default function CreateRequestPage() {
   const [aiTags, setAiTags] = useState<string[]>([]);
   const [aiRewrite, setAiRewrite] = useState('');
   const [aiRewriteLoading, setAiRewriteLoading] = useState(false);
+  const [aiRewriteError, setAiRewriteError] = useState(false);
 
   useEffect(() => {
     const session = getSession();
@@ -40,25 +41,34 @@ export default function CreateRequestPage() {
     }
   }, [title, description]);
 
-  useEffect(() => {
+  async function fetchRewrite() {
     if (!title && !description) { setAiRewrite(''); return; }
     setAiRewriteLoading(true);
-    const timer = setTimeout(async () => {
-      try {
-        const res = await fetch('/api/ai-rewrite', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title, description }),
-        });
-        const data = await res.json();
-        setAiRewrite(data.rewrite || '');
-      } catch {
-        setAiRewrite('');
-      } finally {
-        setAiRewriteLoading(false);
-      }
-    }, 900);
+    setAiRewriteError(false);
+    try {
+      const res = await fetch('/api/ai-rewrite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, description }),
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) { setAiRewriteError(true); setAiRewrite(''); }
+      else setAiRewrite(data.rewrite || '');
+    } catch {
+      setAiRewriteError(true);
+      setAiRewrite('');
+    } finally {
+      setAiRewriteLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (!title && !description) { setAiRewrite(''); setAiRewriteError(false); return; }
+    setAiRewriteLoading(true);
+    setAiRewriteError(false);
+    const timer = setTimeout(fetchRewrite, 900);
     return () => clearTimeout(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [title, description]);
 
   function applyAI() {
@@ -186,13 +196,27 @@ export default function CreateRequestPage() {
               <div className="py-3">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm text-gray-500">Rewrite suggestion</p>
-                  {aiRewriteLoading && <span className="text-xs text-[#0d9f8f] animate-pulse">Gemini thinking…</span>}
+                  {aiRewriteLoading && <span className="text-xs text-[#0d9f8f] animate-pulse">Gemini writing…</span>}
+                  {aiRewriteError && !aiRewriteLoading && (
+                    <button onClick={fetchRewrite} className="text-xs text-red-400 hover:text-red-600 transition-colors">Retry ↺</button>
+                  )}
                 </div>
-                {aiRewrite
-                  ? <p className="text-xs text-[#0f1a18] leading-relaxed bg-gray-50 rounded-xl p-3">{aiRewrite}</p>
-                  : !aiRewriteLoading
-                    ? <p className="text-xs text-gray-400 font-medium">Start describing the challenge to generate a stronger version.</p>
-                    : null}
+                {aiRewriteLoading && (
+                  <div className="space-y-2">
+                    <div className="skeleton h-3 w-full" />
+                    <div className="skeleton h-3 w-4/5" />
+                    <div className="skeleton h-3 w-3/5" />
+                  </div>
+                )}
+                {!aiRewriteLoading && aiRewrite && (
+                  <p className="text-xs text-[#0f1a18] leading-relaxed bg-gray-50 rounded-xl p-3 animate-fade-in">{aiRewrite}</p>
+                )}
+                {!aiRewriteLoading && !aiRewrite && !aiRewriteError && (
+                  <p className="text-xs text-gray-400 font-medium">Start describing the challenge to generate a stronger version.</p>
+                )}
+                {!aiRewriteLoading && aiRewriteError && (
+                  <p className="text-xs text-red-400">Gemini unavailable. Check API key or try again.</p>
+                )}
               </div>
             </div>
           </div>

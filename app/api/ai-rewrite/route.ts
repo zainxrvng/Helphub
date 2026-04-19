@@ -10,24 +10,28 @@ export async function POST(req: Request) {
     return Response.json({ rewrite: '' });
   }
 
-  const { text } = await generateText({
-    model: google('gemini-2.5-flash'),
-    prompt: `You are helping someone write a clear, specific help request for a peer support platform.
+  try {
+    const { text } = await generateText({
+      model: google('gemini-2.5-flash'),
+      prompt: `You are helping someone write a clear, specific help request for a peer-to-peer community support platform called HelpHub.
 
-Their request:
+Their draft:
 Title: ${title || '(no title)'}
 Description: ${description || '(no description)'}
 
-Rewrite the description to be clearer and more actionable. The rewrite should:
-- Clearly state what the problem is
-- Mention what they've already tried (if implied)
-- Specify exactly what kind of help they need
-- Be direct and specific — no filler phrases
-- Stay under 80 words
-- Sound natural, not robotic
+Write an improved version of their description that:
+- Opens with the core problem in one sentence
+- States what they need help with specifically
+- Mentions any context (deadline, what they tried, their skill level) only if present in the draft
+- Is direct and human — no filler, no corporate tone
+- Stays under 80 words
 
-Return ONLY the rewritten description text. No labels, no quotes, no explanation.`,
-  });
+Return ONLY the rewritten description. No labels, no quotes, no intro sentence.`,
+    });
 
-  return Response.json({ rewrite: text.trim() });
+    return Response.json({ rewrite: text.trim() });
+  } catch (err) {
+    console.error('[ai-rewrite]', err);
+    return Response.json({ rewrite: '', error: 'AI unavailable' }, { status: 500 });
+  }
 }
