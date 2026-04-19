@@ -7,7 +7,7 @@ export async function POST(req: Request) {
   const { messages, context } = await req.json();
 
   const result = streamText({
-    model: google('gemini-1.5-flash'),
+    model: google('gemini-2.5-flash'),
     system: `You are HelpHub AI Admin Assistant — an intelligent analyst for HelpHub, a peer-to-peer community support platform.
 
 Platform context:
