@@ -35,13 +35,35 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
+  const openRequests = requests.filter(r => r.status === 'Open');
+  const solvedRequests = requests.filter(r => r.status === 'Solved');
+  const highUrgencyOpen = requests.filter(r => r.urgency === 'High' && r.status === 'Open');
+  const solveRate = requests.length ? Math.round((solvedRequests.length / requests.length) * 100) : 0;
+
   const platformContext = `
-Users: ${users.length} total | Trust scores: ${users.map(u => u.trustScore).join(', ')}
-Requests: ${requests.length} total | Open: ${requests.filter(r => r.status === 'Open').length} | Solved: ${requests.filter(r => r.status === 'Solved').length}
-Messages: ${msgCount} | Notifications: ${notifCount}
-Categories: ${[...new Set(requests.map(r => r.category))].join(', ')}
-Top user: ${users[0]?.name ?? 'N/A'} (trust ${users[0]?.trustScore ?? 0}%)
-High urgency open: ${requests.filter(r => r.urgency === 'High' && r.status === 'Open').length}
+=== HELPHUB PLATFORM DATA ===
+
+USERS (${users.length} total):
+${users.map(u => `- ${u.name} | Trust: ${u.trustScore}% | Contributions: ${u.contributions} | Role: ${u.role} | Badges: ${u.badges.join(', ') || 'none'} | Skills: ${u.skills.join(', ') || 'none'} | Location: ${u.location}`).join('\n')}
+
+REQUESTS (${requests.length} total | ${openRequests.length} open | ${solvedRequests.length} solved | ${solveRate}% solve rate):
+${requests.map(r => `- [${r.status}][${r.urgency}] "${r.title}" by ${r.authorName} | Category: ${r.category} | Tags: ${r.tags.join(', ') || 'none'} | Helpers: ${r.helperIds.length}`).join('\n')}
+
+URGENT OPEN REQUESTS (${highUrgencyOpen.length}):
+${highUrgencyOpen.length > 0 ? highUrgencyOpen.map(r => `- "${r.title}" by ${r.authorName} (${r.category})`).join('\n') : 'None'}
+
+CATEGORY BREAKDOWN:
+${['Web Development', 'Design', 'Career', 'Data Science', 'DevOps', 'Community'].map(cat => {
+    const count = requests.filter(r => r.category === cat).length;
+    return `- ${cat}: ${count} requests`;
+  }).join('\n')}
+
+PLATFORM STATS:
+- Messages exchanged: ${msgCount}
+- Notifications sent: ${notifCount}
+- Top contributor: ${users[0]?.name ?? 'N/A'} (${users[0]?.trustScore ?? 0}% trust, ${users[0]?.contributions ?? 0} contributions)
+- Users with no badges: ${users.filter(u => u.badges.length === 0).map(u => u.name).join(', ') || 'none'}
+- Unhelped open requests: ${openRequests.filter(r => r.helperIds.length === 0).length}
 `.trim();
 
   const [chatInput, setChatInput] = useState('');
@@ -323,10 +345,12 @@ High urgency open: ${requests.filter(r => r.urgency === 'High' && r.status === '
                   <p className="text-xs text-gray-400 mt-4 leading-relaxed">This context is automatically sent to the AI with every message so it can give data-aware answers.</p>
                   <div className="mt-4 space-y-2">
                     {[
-                      'Who needs a trust score boost?',
-                      'Which requests need urgent attention?',
-                      'Suggest badges for top contributors',
-                      'What categories are underserved?',
+                      'Who deserves a trust score boost and why?',
+                      'Which open requests have no helpers yet?',
+                      'Suggest specific badges for each user based on their contributions',
+                      'Which categories are underserved and what skills are missing?',
+                      'Give a full platform health report',
+                      'Who are the top 3 mentors and what makes them stand out?',
                     ].map(q => (
                       <button key={q} onClick={() => setChatInput(q)}
                         className="block w-full text-left text-xs text-[#0d9f8f] bg-[#0d9f8f]/5 hover:bg-[#0d9f8f]/10 rounded-xl px-3 py-2 transition-colors">
@@ -342,7 +366,7 @@ High urgency open: ${requests.filter(r => r.urgency === 'High' && r.status === '
                     <div className="w-9 h-9 bg-[#0d9f8f] rounded-xl flex items-center justify-center text-white font-bold text-sm">✦</div>
                     <div>
                       <p className="font-bold text-[#0f1a18] text-sm">HelpHub AI Assistant</p>
-                      <p className="text-xs text-gray-400">Powered by Claude · Platform-aware</p>
+                      <p className="text-xs text-gray-400">Powered by Gemini 2.5 Flash · Platform-aware</p>
                     </div>
                   </div>
 
